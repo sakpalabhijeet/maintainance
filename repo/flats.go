@@ -3,7 +3,6 @@ package repo
 import (
 	"Maintainance/models"
 	"context"
-
 	"gorm.io/gorm"
 )
 
@@ -15,7 +14,7 @@ type flatRepository struct{
 	db *gorm.DB
 }
 
-func NewFlatReporsitry(db *gorm.DB) FlatRepository{
+func NewFlatRepository(db *gorm.DB) FlatRepository{
 	return &flatRepository{db:db}
 }
 
