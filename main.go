@@ -1,8 +1,24 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"Maintainance/database"
+	"Maintainance/handlers"
+	"Maintainance/internal/config"
+	"Maintainance/repo"
+	"Maintainance/routes"
+	"Maintainance/services"
+
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
-	r := gin.Default()
-	r.Run(":8080")
+	cfg:= config.Load()
+	db:= database.Connect(cfg)
+	flatRepo := repo.NewFlatReporsitry(db)
+	flatService:= services.NewFlatService(flatRepo)
+	flatHandler:= handlers.NewFlatHandler(flatService)
+	router := gin.Default()
+	api:= router.Group("/api")
+	routes.RegisterFlatRoutes(api,flatHandler)
+	router.Run(":8080")
 }

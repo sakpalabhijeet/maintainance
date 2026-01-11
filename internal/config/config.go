@@ -36,6 +36,7 @@ type JWTConfig struct{
 
 func Load()* Config{
 	viper.SetConfigName("config")
+	viper.SetConfigFile(".env")
 	viper.SetConfigType("env")
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("./configs")
