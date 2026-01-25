@@ -23,10 +23,19 @@ func main() {
 	flatService:= services.NewFlatService(flatRepo)
 	flatHandler:= handlers.NewFlatHandler(flatService)
 	// -----------------------------------------------------
-
+	ownerRepo := repo.NewOwnerRepository(db)
+	ownerService:= services.NewOwnerService(ownerRepo)
+	ownerHandler:= handlers.NewOwnerHandler(ownerService)
+	// -----------------------------------------------------
+	userRepo:= repo.NewUserRepository(db)
+	userService:= services.NewUserService(userRepo)
+	userHandler:= handlers.NewUserHandler(userService)
+	// -----------------------------------------------------
 	router := gin.Default()
 	api:= router.Group("/api")
 	routes.RegisterFlatRoutes(api,flatHandler)
 	routes.RegisterSocietyRoutes(api,societyHandler)
+	routes.RegisterOwnerRoutes(api,ownerHandler)
+	routes.RegisterUserRoutes(api, userHandler)
 	router.Run(":8080")
 }
