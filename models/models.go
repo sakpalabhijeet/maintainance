@@ -27,10 +27,10 @@ type Owners struct{
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type Users struct{
-	Id int64 `json:"id" gorm:"primaryKey"`
-	Email string `json:"email"`
-	Password string `json:"password_hash"`
-	Role string `json:"role"`
-	CreatedAt time.Time `json:"created_at"`
+type Users struct {
+    ID           uint      `json:"id"`
+    Email        string    `json:"email"`
+    PasswordHash string    `json:"password_hash" gorm:"column:password_hash"`
+    Role         string    `json:"role"`
+    CreatedAt    time.Time
 }
