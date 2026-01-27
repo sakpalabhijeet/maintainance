@@ -7,7 +7,6 @@ import (
 	"Maintainance/repo"
 	"Maintainance/routes"
 	"Maintainance/services"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,11 +30,16 @@ func main() {
 	userService:= services.NewUserService(userRepo)
 	userHandler:= handlers.NewUserHandler(userService)
 	// -----------------------------------------------------
+	billRepo:= repo.NewBillRepository(db)
+	billService:= services.NewBillService(billRepo)
+	billHandler:= handlers.NewBillHandler(billService)
+	// -----------------------------------------------------
 	router := gin.Default()
 	api:= router.Group("/api")
 	routes.RegisterFlatRoutes(api,flatHandler)
 	routes.RegisterSocietyRoutes(api,societyHandler)
 	routes.RegisterOwnerRoutes(api,ownerHandler)
 	routes.RegisterUserRoutes(api, userHandler)
+	routes.RegisterBillRoutes(api,*billHandler)
 	router.Run(":8080")
 }

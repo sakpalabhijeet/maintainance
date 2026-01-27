@@ -21,7 +21,7 @@ func (h* FlatHandler)CreateFlat(c *gin.Context){
 
 	if err:= c.ShouldBindJSON(&flat); err!=nil{
 		c.JSON(http.StatusBadRequest, gin.H{
-			"success": "false",
+			"success": false,
 			"error": err.Error(),
 		})
 		return

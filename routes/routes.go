@@ -21,3 +21,6 @@ func RegisterOwnerRoutes(r *gin.RouterGroup, handler *handlers.OwnerHandler){
 func RegisterUserRoutes(r *gin.RouterGroup, handler *handlers.UserHandler){
 	r.POST("/users", handler.CreateUser)
 }
+func RegisterBillRoutes( r* gin.RouterGroup, handler handlers.BillHandler){
+	r.POST("/bills", handler.CreateBill)
+}
