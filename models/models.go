@@ -46,3 +46,26 @@ type Bill struct {
     CreatedAt   time.Time `json:"created_at"`
     UpdatedAt   time.Time `json:"updated_at"`
 }
+
+type BillItem struct {
+	ID          int64     `json:"id" gorm:"primaryKey"`
+	BillID      int64     `json:"bill_id" gorm:"not null;index"`
+	Description string    `json:"description" gorm:"type:varchar(100);not null"`
+	Rate        float64   `json:"rate" gorm:"type:numeric(10,2);not null"`
+	Quantity    float64   `json:"quantity" gorm:"type:numeric(10,2);not null"`
+	Amount      float64   `json:"amount" gorm:"type:numeric(10,2);not null"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type MaintenanceRate struct {
+	ID              int64     `json:"id" gorm:"primaryKey"`
+	RateType        string    `json:"rate_type"` // maintenance, sinking_fund
+	RatePerSqFt     float64   `json:"rate_per_sq_ft"`
+	GSTPercent      float64   `json:"gst_percent"` // 18 for 18%
+	IsActive        bool      `json:"is_active"`
+	StartDate       time.Time `json:"start_date"`
+	EndDate         *time.Time `json:"end_date"`
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+}

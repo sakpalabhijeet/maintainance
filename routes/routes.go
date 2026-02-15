@@ -6,21 +6,70 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterFlatRoutes(r *gin.RouterGroup, handler * handlers.FlatHandler){
-	r.POST("/flats", handler.CreateFlat)
-}
+func RegisterRoutes(
+	router *gin.Engine,
+	flatHandler *handlers.FlatHandler,
+	societyHandler *handlers.SocietyHandler,
+	ownerHandler *handlers.OwnerHandler,
+	userHandler *handlers.UserHandler,
+	billHandler *handlers.BillHandler,
+	billItemHandler *handlers.BillItemHandler,
+	maintenanceRateHandler *handlers.MaintenanceRateHandler,
+) {
 
-func RegisterSocietyRoutes( r*gin.RouterGroup, handler *handlers.SocietyHandler){
-	r.POST("/society", handler.CreateSociety)
-}
+	api := router.Group("/api")
 
-func RegisterOwnerRoutes(r *gin.RouterGroup, handler *handlers.OwnerHandler){
-	r.POST("/owners", handler.CreateOwner)
-}
+	// -------------------------
+	// Society Routes
+	// -------------------------
+	api.POST("/societies", societyHandler.CreateSociety)
+	// api.GET("/societies", societyHandler.GetAll)
+	// api.GET("/societies/:id", societyHandler.GetByID)
 
-func RegisterUserRoutes(r *gin.RouterGroup, handler *handlers.UserHandler){
-	r.POST("/users", handler.CreateUser)
-}
-func RegisterBillRoutes( r* gin.RouterGroup, handler handlers.BillHandler){
-	r.POST("/bills", handler.CreateBill)
+	// -------------------------
+	// User Routes
+	// -------------------------
+	api.POST("/users", userHandler.Create)
+	api.GET("/users", userHandler.GetAll)
+	api.GET("/users/:id", userHandler.GetByID)
+	api.DELETE("/users/:id", userHandler.Delete)
+
+	// -------------------------
+	// Owner Routes
+	// -------------------------
+	api.POST("/owners", ownerHandler.Create)
+	api.GET("/owners", ownerHandler.GetAll)
+	api.GET("/owners/:id", ownerHandler.GetByID)
+	api.PUT("/owners/:id", ownerHandler.Update)
+	api.DELETE("/owners/:id", ownerHandler.Delete)
+
+	// -------------------------
+	// Flat Routes
+	// -------------------------
+	api.POST("/flats", flatHandler.Create)
+	// api.GET("/flats", flatHandler.GetAll)
+	api.GET("/flats/:id", flatHandler.GetByID)
+	api.PUT("/flats/:id", flatHandler.Update)
+	api.DELETE("/flats/:id", flatHandler.Delete)
+
+	// -------------------------
+	// Maintenance Rate Routes
+	// -------------------------
+	api.POST("/maintenance-rates", maintenanceRateHandler.Create)
+	api.GET("/maintenance-rates", maintenanceRateHandler.GetAll)
+	api.GET("/maintenance-rates/:id", maintenanceRateHandler.GetByID)
+	api.PUT("/maintenance-rates/:id", maintenanceRateHandler.Update)
+	api.DELETE("/maintenance-rates/:id", maintenanceRateHandler.Delete)
+
+	// -------------------------
+	// Bill Routes
+	// -------------------------
+	api.POST("/bills/generate", billHandler.GenerateMonthlyBills)
+	// api.GET("/bills/:id", billHandler.GetByID)
+	// api.GET("/bills", billHandler.GetAll)
+
+	// -------------------------
+	// Bill Item Routes
+	// -------------------------
+	api.GET("/billitems/:bill_id", billItemHandler.GetByBillID)
 }

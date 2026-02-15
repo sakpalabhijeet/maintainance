@@ -1,43 +1,75 @@
 package handlers
 
 import (
-	"Maintainance/models"
 	"Maintainance/services"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 type BillHandler struct {
-	services services.BillService
+	service services.BillService
 }
 
-func NewBillHandler ( services services.BillService) *BillHandler{
-	return &BillHandler{
-		services: services,
-	}
+func NewBillHandler(service services.BillService) *BillHandler {
+	return &BillHandler{service: service}
 }
 
-func (h *BillHandler)CreateBill( c *gin.Context){
-	var bill models.Bill
 
-	if err:= c.ShouldBindJSON(&bill);err!= nil{
+type GenerateBillRequest struct {
+	BillMonth string `json:"bill_month" binding:"required"` // format: 2006-01-02
+	DueDate   string `json:"due_date" binding:"required"`   // format: 2006-01-02
+}
+
+
+func (h *BillHandler) GenerateMonthlyBills(c *gin.Context) {
+
+	var req GenerateBillRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"error": err.Error(),
+			"error":   err.Error(),
 		})
 		return
 	}
 
-	if err:= h.services.CreateBill(c.Request.Context(), &bill);err!= nil{
+	// Parse dates (YYYY-MM-DD)
+	billMonth, err := time.Parse("2006-01-02", req.BillMonth)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"error": err.Error(),
+			"error":   "invalid bill_month format (use YYYY-MM-DD)",
 		})
+		return
 	}
-	c.JSON(http.StatusCreated, gin.H{
-		"status": 201,
+
+	dueDate, err := time.Parse("2006-01-02", req.DueDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"error":   "invalid due_date format (use YYYY-MM-DD)",
+		})
+		return
+	}
+
+	err = h.service.GenerateMonthlyBills(
+		c.Request.Context(),
+		billMonth,
+		dueDate,
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": "bill created successfully!",
+		"message": "monthly bills generated successfully",
 	})
 }

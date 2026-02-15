@@ -7,39 +7,76 @@ import (
 	"Maintainance/repo"
 	"Maintainance/routes"
 	"Maintainance/services"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	cfg:= config.Load()
-	db:= database.Connect(cfg)
 
+	// ---------------------------
+	// Load Config & Connect DB
+	// ---------------------------
+	cfg := config.Load()
+	db := database.Connect(cfg)
+
+	// ---------------------------
+	// Repositories
+	// ---------------------------
 	societyRepo := repo.NewSocietyRepository(db)
-	societyService:= services.NewSocietyService(societyRepo)
-	societyHandler:= handlers.NewSocietyHandler(societyService)
-	// -----------------------------------------------------
 	flatRepo := repo.NewFlatRepository(db)
-	flatService:= services.NewFlatService(flatRepo)
-	flatHandler:= handlers.NewFlatHandler(flatService)
-	// -----------------------------------------------------
 	ownerRepo := repo.NewOwnerRepository(db)
-	ownerService:= services.NewOwnerService(ownerRepo)
-	ownerHandler:= handlers.NewOwnerHandler(ownerService)
-	// -----------------------------------------------------
-	userRepo:= repo.NewUserRepository(db)
-	userService:= services.NewUserService(userRepo)
-	userHandler:= handlers.NewUserHandler(userService)
-	// -----------------------------------------------------
-	billRepo:= repo.NewBillRepository(db)
-	billService:= services.NewBillService(billRepo)
-	billHandler:= handlers.NewBillHandler(billService)
-	// -----------------------------------------------------
+	userRepo := repo.NewUserRepository(db)
+	billRepo := repo.NewBillRepository(db)
+	billItemRepo := repo.NewBillItemRepository(db)
+	maintenanceRateRepo := repo.NewMaintenanceRateRepository(db)
+
+	// ---------------------------
+	// Services
+	// ---------------------------
+	societyService := services.NewSocietyService(societyRepo)
+	flatService := services.NewFlatService(flatRepo)
+	ownerService := services.NewOwnerService(ownerRepo)
+	userService := services.NewUserService(userRepo)
+
+	billService := services.NewBillService(
+		billRepo,
+		flatRepo,
+		maintenanceRateRepo,
+		billItemRepo,
+	)
+
+	maintenanceRateService := services.NewMaintenanceRateService(maintenanceRateRepo)
+	billItemService := services.NewBillItemService(billItemRepo)
+
+	// ---------------------------
+	// Handlers
+	// ---------------------------
+	societyHandler := handlers.NewSocietyHandler(societyService)
+	flatHandler := handlers.NewFlatHandler(flatService)
+	ownerHandler := handlers.NewOwnerHandler(ownerService)
+	userHandler := handlers.NewUserHandler(userService)
+	billHandler := handlers.NewBillHandler(billService)
+	maintenanceRateHandler := handlers.NewMaintenanceRateHandler(maintenanceRateService)
+	billItemHandler := handlers.NewBillItemHandler(billItemService)
+
+	// ---------------------------
+	// Router
+	// ---------------------------
 	router := gin.Default()
-	api:= router.Group("/api")
-	routes.RegisterFlatRoutes(api,flatHandler)
-	routes.RegisterSocietyRoutes(api,societyHandler)
-	routes.RegisterOwnerRoutes(api,ownerHandler)
-	routes.RegisterUserRoutes(api, userHandler)
-	routes.RegisterBillRoutes(api,*billHandler)
+
+	routes.RegisterRoutes(
+		router,
+		flatHandler,
+		societyHandler,
+		ownerHandler,
+		userHandler,
+		billHandler,
+		billItemHandler,
+		maintenanceRateHandler,
+	)
+
+	// ---------------------------
+	// Start Server
+	// ---------------------------
 	router.Run(":8080")
 }
